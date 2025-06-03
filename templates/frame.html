@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordinal Frame</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            cursor: none;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .frame-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .ordinal-display {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 8px;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .ordinal-display:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 60px rgba(247, 147, 26, 0.3);
+        }
+
+        .metadata-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 25px;
+            border-radius: 12px;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(247, 147, 26, 0.3);
+        }
+
+        .metadata-overlay.show {
+            transform: translateY(0);
+        }
+
+        .inscription-id {
+            color: #f7931a;
+            font-size: 14px;
+            margin-bottom: 12px;
+            word-break: break-all;
+            font-weight: bold;
+        }
+
+        .inscription-number {
+            color: #fff;
+            font-size: 20px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .collection-info {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 6px;
+            color: #cccccc;
+        }
+
+        .collection-info strong {
+            color: #f7931a;
+        }
+
+        .rarity-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+
+        .rarity-common {
+            background: rgba(100, 100, 100, 0.3);
+            color: #ccc;
+        }
+
+        .rarity-uncommon {
+            background: rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+        }
+
+        .rarity-rare {
+            background: rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+        }
+
+        .rarity-epic {
+            background: rgba(168, 85, 247, 0.3);
+            color: #a78bfa;
+        }
+
+        .rarity-legendary {
+            background: rgba(234, 179, 8, 0.3);
+            color: #fbbf24;
+        }
+
+        .nav-indicators {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: #f7931a;
+            transform: scale(1.3);
+            box-shadow: 0 0 15px rgba(247, 147, 26, 0.6);
+        }
+
+        .nav-dot:hover {
+            background: rgba(247, 147, 26, 0.7);
+        }
+
+        .touch-hint {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 12px;
+            opacity: 0.6;
+            animation: pulse 3s infinite;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.3; }
+        }
+
+        .controls {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .control-btn:hover {
+            background: rgba(247, 147, 26, 0.8);
+            border-color: #f7931a;
+            transform: scale(1.1);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 18px;
+            color: #f7931a;
+            height: 100vh;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(247, 147, 26, 0.3);
+            border-top: 3px solid #f7931a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 16px;
+            color: #ff6b6b;
+            height: 100vh;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .error-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .error-message {
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .error-btn {
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #f7931a, #ffb347);
+            color: #000;
+            text-decoration: none;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .error-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .slideshow-indicator {
+            position: absolute;
+            top: 25px;
+            right: 80px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 6px 10px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .slideshow-indicator.paused {
+            color: #f7931a;
+            border-color: rgba(247, 147, 26, 0.5);
+        }
+
+        /* Responsive adjustments for different screen sizes */
+        @media (max-width: 1280px) and (max-height: 800px) {
+            .ordinal-display {
+                max-width: 95vw;
+                max-height: 80vh;
+            }
+            
+            .metadata-overlay {
+                font-size: 12px;
+                padding: 20px;
+            }
+            
+            .touch-hint, .slideshow-indicator {
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                top: 15px;
+                left: 15px;
+            }
+            
+            .control-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+            
+            .metadata-overlay {
+                left: 15px;
+                right: 15px;
+                bottom: 15px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="frame-container">
+        <!-- Controls -->
+        <div class="controls">
+            <a href="/select" class="control-btn" title="Back to Selection">⚙️</a>
+            <div class="control-btn" onclick="toggleSlideshow()" title="Play/Pause" id="playPauseBtn">⏸️</div>
+        </div>
+        
+        <!-- Touch hint -->
+        <div class="touch-hint">TAP TO CYCLE • HOLD FOR INFO</div>
+        
+        <!-- Slideshow indicator -->
+        <div class="slideshow-indicator" id="slideshowIndicator">Auto: 30s</div>
+        
+        <!-- Main display area -->
+        <img id="ordinalImage" class="ordinal-display" src="" alt="Ordinal Inscription" style="display: none;">
+        
+        <!-- Loading state -->
+        <div id="loadingState" class="loading">
+            <div class="loading-spinner"></div>
+            Loading your selected Ordinals...
+        </div>
+        
+        <!-- Error state -->
+        <div id="errorState" class="error" style="display: none;">
+            <div class="error-icon">🖼️</div>
+            <div class="error-message">
+                No Ordinals selected for display
+            </div>
+            <div class="error-actions">
+                <a href="/setup" class="error-btn">Add Wallet</a>
+                <a href="/select" class="error-btn">Select Ordinals</a>
+            </div>
+        </div>
+        
+        <!-- Metadata overlay -->
+        <div class="metadata-overlay" id="metadataOverlay">
+            <div class="inscription-number" id="inscriptionNumber"></div>
+            <div class="inscription-id" id="inscriptionId"></div>
+            <div class="collection-info" id="collectionInfo"></div>
+            <div class="rarity-badge" id="rarityBadge"></div>
+        </div>
+        
+        <!-- Navigation indicators -->
+        <div class="nav-indicators" id="navIndicators"></div>
+    </div>
+
+    <script>
+        class OrdinalFrame {
+            constructor() {
+                this.ordinals = [];
+                this.currentIndex = 0;
+                this.showingMetadata = false;
+                this.metadataTimeout = null;
+                this.slideshowInterval = null;
+                this.slideshowDuration = {{ slideshow_interval | default(30) }} * 1000; // Convert to milliseconds
+                this.isPlaying = true;
+                
+                // DOM elements
+                this.loadingEl = document.getElementById('loadingState');
+                this.errorEl = document.getElementById('errorState');
+                this.imageEl = document.getElementById('ordinalImage');
+                this.metadataEl = document.getElementById('metadataOverlay');
+                this.navEl = document.getElementById('navIndicators');
+                this.playPauseBtn = document.getElementById('playPauseBtn');
+                this.slideshowIndicator = document.getElementById('slideshowIndicator');
+                
+                this.init();
+            }
+            
+            async init() {
+                await this.loadOrdinals();
+                this.setupEventListeners();
+                
+                if (this.ordinals.length > 0) {
+                    this.showOrdinal(0);
+                    this.createNavIndicators();
+                    this.startSlideshow();
+                    this.hideLoading();
+                } else {
+                    this.showError();
+                }
+            }
+            
+            async loadOrdinals() {
+                // Load ordinals data from server
+                this.ordinals = {{ ordinals | tojson | safe }};
+                
+                // Simulate loading delay for smooth UX
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            setupEventListeners() {
+                // Touch/click to cycle
+                this.imageEl.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.nextOrdinal();
+                });
+                
+                this.imageEl.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.nextOrdinal();
+                });
+                
+                // Long press/hold to show metadata
+                let pressTimer = null;
+                let touchStartTime = 0;
+                
+                const startPress = () => {
+                    touchStartTime = Date.now();
+                    pressTimer = setTimeout(() => this.toggleMetadata(), 500);
+                };
+                
+                const endPress = () => {
+                    const pressDuration = Date.now() - touchStartTime;
+                    clearTimeout(pressTimer);
+                    
+                    // If it was a quick press (< 300ms), cycle to next
+                    if (pressDuration < 300) {
+                        this.nextOrdinal();
+                    }
+                };
+                
+                this.imageEl.addEventListener('mousedown', startPress);
+                this.imageEl.addEventListener('mouseup', endPress);
+                this.imageEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+                
+                this.imageEl.addEventListener('touchstart', startPress);
+                this.imageEl.addEventListener('touchend', endPress);
+                
+                // Keyboard navigation (for development)
+                document.addEventListener('keydown', (e) => {
+                    switch(e.key) {
+                        case 'ArrowRight':
+                        case ' ':
+                            e.preventDefault();
+                            this.nextOrdinal();
+                            break;
+                        case 'ArrowLeft':
+                            e.preventDefault();
+                            this.previousOrdinal();
+                            break;
+                        case 'i':
+                        case 'I':
+                            this.toggleMetadata();
+                            break;
+                        case 'p':
+                        case 'P':
+                            this.toggleSlideshow();
+                            break;
+                    }
+                });
+            }
+            
+            showOrdinal(index) {
+                if (index < 0 || index >= this.ordinals.length) return;
+                
+                this.currentIndex = index;
+                const ordinal = this.ordinals[index];
+                
+                // Show loading state
+                this.imageEl.style.display = 'none';
+                
+                // Load the image
+                const img = new Image();
+                img.onload = () => {
+                    this.imageEl.src = ordinal.content_url || `/content/${ordinal.id}`;
+                    this.imageEl.alt = `Inscription #${ordinal.number}`;
+                    this.imageEl.style.display = 'block';
+                    this.updateNavIndicators();
+                };
+                
+                img.onerror = () => {
+                    console.error('Failed to load ordinal:', ordinal.id);
+                    // Try next ordinal if this one fails
+                    if (this.ordinals.length > 1) {
+                        setTimeout(() => this.nextOrdinal(), 1000);
+                    }
+                };
+                
+                img.src = ordinal.content_url || `/content/${ordinal.id}`;
+                
+                // Update metadata
+                this.updateMetadata(ordinal);
+            }
+            
+            updateMetadata(ordinal) {
+                document.getElementById('inscriptionNumber').textContent = `Inscription #${ordinal.number}`;
+                document.getElementById('inscriptionId').textContent = ordinal.id;
+                
+                const collectionInfo = document.getElementById('collectionInfo');
+                let infoHTML = `<strong>Type:</strong> ${ordinal.content_type || 'Unknown'}<br>`;
+                infoHTML += `<strong>Size:</strong> ${this.formatFileSize(ordinal.content_length)}<br>`;
+                if (ordinal.collection_slug) {
+                    infoHTML += `<strong>Collection:</strong> ${ordinal.collection_slug}<br>`;
+                }
+                infoHTML += `<strong>Block:</strong> ${ordinal.block_height || 'Unknown'}`;
+                collectionInfo.innerHTML = infoHTML;
+                
+                const rarityBadge = document.getElementById('rarityBadge');
+                const rarity = ordinal.sat_rarity || 'common';
+                rarityBadge.textContent = rarity;
+                rarityBadge.className = `rarity-badge rarity-${rarity.toLowerCase()}`;
+            }
+            
+            formatFileSize(bytes) {
+                if (!bytes) return 'Unknown';
+                if (bytes < 1024) return bytes + ' B';
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            }
+            
+            nextOrdinal() {
+                this.hideMetadata();
+                const nextIndex = (this.currentIndex + 1) % this.ordinals.length;
+                this.showOrdinal(nextIndex);
+                this.resetSlideshow();
+            }
+            
+            previousOrdinal() {
+                this.hideMetadata();
+                const prevIndex = (this.currentIndex - 1 + this.ordinals.length) % this.ordinals.length;
+                this.showOrdinal(prevIndex);
+                this.resetSlideshow();
+            }
+            
+            toggleMetadata() {
+                if (this.showingMetadata) {
+                    this.hideMetadata();
+                } else {
+                    this.showMetadata();
+                }
+            }
+            
+            showMetadata() {
+                this.metadataEl.classList.add('show');
+                this.showingMetadata = true;
+                
+                // Auto-hide after 5 seconds
+                clearTimeout(this.metadataTimeout);
+                this.metadataTimeout = setTimeout(() => this.hideMetadata(), 5000);
+            }
+            
+            hideMetadata() {
+                this.metadataEl.classList.remove('show');
+                this.showingMetadata = false;
+                clearTimeout(this.metadataTimeout);
+            }
+            
+            createNavIndicators() {
+                this.navEl.innerHTML = '';
+                this.ordinals.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot';
+                    dot.addEventListener('click', () => {
+                        this.showOrdinal(index);
+                        this.resetSlideshow();
+                    });
+                    this.navEl.appendChild(dot);
+                });
+                this.updateNavIndicators();
+            }
+            
+            updateNavIndicators() {
+                const dots = this.navEl.querySelectorAll('.nav-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentIndex);
+                });
+            }
+            
+            startSlideshow() {
+                if (this.ordinals.length <= 1) return;
+                
+                this.slideshowInterval = setInterval(() => {
+                    if (!this.showingMetadata && this.isPlaying) {
+                        this.nextOrdinal();
+                    }
+                }, this.slideshowDuration);
+                
+                this.updateSlideshowIndicator();
+            }
+            
+            resetSlideshow() {
+                if (this.slideshowInterval) {
+                    clearInterval(this.slideshowInterval);
+                    this.startSlideshow();
+                }
+            }
+            
+            toggleSlideshow() {
+                this.isPlaying = !this.isPlaying;
+                this.playPauseBtn.textContent = this.isPlaying ? '⏸️' : '▶️';
+                this.updateSlideshowIndicator();
+            }
+            
+            updateSlideshowIndicator() {
+                const seconds = this.slideshowDuration / 1000;
+                this.slideshowIndicator.textContent = this.isPlaying ? 
+                    `Auto: ${seconds}s` : 'Paused';
+                this.slideshowIndicator.classList.toggle('paused', !this.isPlaying);
+            }
+            
+            hideLoading() {
+                this.loadingEl.style.display = 'none';
+            }
+            
+            showError() {
+                this.loadingEl.style.display = 'none';
+                this.errorEl.style.display = 'flex';
+            }
+        }
+        
+        // Global function for slideshow toggle
+        function toggleSlideshow() {
+            if (window.ordinalFrame) {
+                window.ordinalFrame.toggleSlideshow();
+            }
+        }
+        
+        // Initialize the frame when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.ordinalFrame = new OrdinalFrame();
+        });
+    </script>
+</body>
+</html>

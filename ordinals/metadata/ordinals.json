@@ -1,0 +1,83 @@
+{
+  "ordinals": [
+    {
+      "id": "0000077c4851b026f4d19c25bf80de7b5b44b856da50d67ae8da304bd3be6999i5237",
+      "number": 76566591,
+      "address": "bc1prrx90unuys03pkylsspf776us24gdkrssu8vg476vw9c9s83zpgq4wyreg",
+      "content_type": "image/png",
+      "content_length": 204,
+      "content_url": "https://api.hiro.so/ordinals/v1/inscriptions/0000077c4851b026f4d19c25bf80de7b5b44b856da50d67ae8da304bd3be6999i5237/content",
+      "timestamp": 1729387551000,
+      "sat_ordinal": "1573459136931602",
+      "sat_rarity": "common",
+      "fee": 0,
+      "value": "330",
+      "block_height": 866429,
+      "tx_id": "0000077c4851b026f4d19c25bf80de7b5b44b856da50d67ae8da304bd3be6999",
+      "collection_slug": null,
+      "metadata": {
+        "BODY": "Purple",
+        "COUNT": 3,
+        "EARRING": "-",
+        "EYES": "Ledger",
+        "HEAD": "Rabbit",
+        "IMG": "#2596"
+      }
+    },
+    {
+      "id": "41abe9130d402b8c52fda88f9d11c8fe5ef1c96908b8d4c1c0f878d7d931fe17i0",
+      "number": 9534612,
+      "address": "bc1prrx90unuys03pkylsspf776us24gdkrssu8vg476vw9c9s83zpgq4wyreg",
+      "content_type": "image/webp",
+      "content_length": 3350,
+      "content_url": "https://api.hiro.so/ordinals/v1/inscriptions/41abe9130d402b8c52fda88f9d11c8fe5ef1c96908b8d4c1c0f878d7d931fe17i0/content",
+      "timestamp": 1720148870000,
+      "sat_ordinal": "1009304135945912",
+      "sat_rarity": "common",
+      "fee": 0,
+      "value": "10000",
+      "block_height": 791707,
+      "tx_id": "41abe9130d402b8c52fda88f9d11c8fe5ef1c96908b8d4c1c0f878d7d931fe17",
+      "collection_slug": null,
+      "metadata": null
+    },
+    {
+      "id": "8872094be1c2e3bb63a16c0b21cd5ae8b1540fdd7e1fde5b31634433d3757653i0",
+      "number": 9507426,
+      "address": "bc1prrx90unuys03pkylsspf776us24gdkrssu8vg476vw9c9s83zpgq4wyreg",
+      "content_type": "image/webp",
+      "content_length": 3808,
+      "content_url": "https://api.hiro.so/ordinals/v1/inscriptions/8872094be1c2e3bb63a16c0b21cd5ae8b1540fdd7e1fde5b31634433d3757653i0/content",
+      "timestamp": 1709449522000,
+      "sat_ordinal": "970079934277129",
+      "sat_rarity": "common",
+      "fee": 0,
+      "value": "10000",
+      "block_height": 791682,
+      "tx_id": "8872094be1c2e3bb63a16c0b21cd5ae8b1540fdd7e1fde5b31634433d3757653",
+      "collection_slug": null,
+      "metadata": null
+    },
+    {
+      "id": "98f2ae1e4edfbc5c591d4421127660700d79f887663c119e79b3f9bc7901ceb2i0",
+      "number": 149514,
+      "address": "bc1prrx90unuys03pkylsspf776us24gdkrssu8vg476vw9c9s83zpgq4wyreg",
+      "content_type": "image/webp",
+      "content_length": 43340,
+      "content_url": "https://api.hiro.so/ordinals/v1/inscriptions/98f2ae1e4edfbc5c591d4421127660700d79f887663c119e79b3f9bc7901ceb2i0/content",
+      "timestamp": 1743173427000,
+      "sat_ordinal": "881891707104977",
+      "sat_rarity": "common",
+      "fee": 0,
+      "value": "10000",
+      "block_height": 777450,
+      "tx_id": "98f2ae1e4edfbc5c591d4421127660700d79f887663c119e79b3f9bc7901ceb2",
+      "collection_slug": null,
+      "metadata": null
+    }
+  ],
+  "last_updated": "2025-06-02T23:29:05.420850",
+  "address": "bc1prrx90unuys03pkylsspf776us24gdkrssu8vg476vw9c9s83zpgq4wyreg",
+  "total_count": 6,
+  "image_count": 4
+}

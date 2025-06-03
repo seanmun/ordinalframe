@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordinal Frame - Setup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .setup-container {
+            max-width: 600px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: linear-gradient(45deg, #f7931a, #ffb347);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #f7931a, #ffb347);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #cccccc;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #f7931a;
+            font-weight: bold;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #f7931a;
+            box-shadow: 0 0 20px rgba(247, 147, 26, 0.3);
+        }
+
+        input[type="text"]::placeholder {
+            color: #666666;
+        }
+
+        .address-validation {
+            margin-top: 8px;
+            font-size: 12px;
+            min-height: 20px;
+        }
+
+        .validation-valid {
+            color: #4ade80;
+        }
+
+        .validation-invalid {
+            color: #ef4444;
+        }
+
+        .address-examples {
+            font-size: 12px;
+            color: #888888;
+            margin-top: 12px;
+        }
+
+        .address-examples strong {
+            color: #f7931a;
+        }
+
+        .fetch-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #f7931a, #ffb347);
+            border: none;
+            border-radius: 12px;
+            color: #000000;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+        }
+
+        .fetch-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(247, 147, 26, 0.4);
+        }
+
+        .fetch-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #000;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-message {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .result-success {
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            color: #4ade80;
+        }
+
+        .result-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .feature-list {
+            text-align: left;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-list h3 {
+            color: #f7931a;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .feature-list ul {
+            list-style: none;
+        }
+
+        .feature-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 14px;
+            color: #cccccc;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .navigation-links {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link {
+            color: #f7931a;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #ffb347;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <div class="logo">🖼️</div>
+        
+        <h1>Ordinal Frame Setup</h1>
+        <p class="subtitle">
+            Enter your Bitcoin wallet address to fetch your Ordinals collection.
+            We'll scan for all inscriptions owned by your address.
+        </p>
+
+        <form id="setupForm">
+            <div class="form-group">
+                <label for="walletAddress">Bitcoin Wallet Address</label>
+                <div class="input-container">
+                    <input 
+                        type="text" 
+                        id="walletAddress" 
+                        name="walletAddress"
+                        placeholder="bc1q... or 1... or 3..."
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                </div>
+                <div id="addressValidation" class="address-validation"></div>
+                <div class="address-examples">
+                    <strong>Supported formats:</strong> Legacy (1...), SegWit (bc1q...), Taproot (bc1p...)
+                </div>
+            </div>
+
+            <button type="submit" id="fetchButton" class="fetch-button" disabled>
+                <span class="loading-spinner" id="loadingSpinner"></span>
+                <span id="buttonText">Fetch My Ordinals</span>
+            </button>
+        </form>
+
+        <div id="resultMessage" class="result-message"></div>
+
+        <div class="feature-list">
+            <h3>What happens next?</h3>
+            <ul>
+                <li>We'll fetch all Ordinals inscriptions from your address</li>
+                <li>You can select which pieces to display in your frame</li>
+                <li>Selected Ordinals will be cached locally for offline viewing</li>
+                <li>Your frame will cycle through your curated collection</li>
+            </ul>
+        </div>
+
+        <div class="navigation-links">
+            <a href="/frame" class="nav-link">View Frame</a>
+            <a href="/select" class="nav-link">Manage Selection</a>
+            <a href="/api/health" class="nav-link">System Status</a>
+        </div>
+    </div>
+
+    <script>
+        class SetupManager {
+            constructor() {
+                this.addressInput = document.getElementById('walletAddress');
+                this.validationDiv = document.getElementById('addressValidation');
+                this.fetchButton = document.getElementById('fetchButton');
+                this.buttonText = document.getElementById('buttonText');
+                this.loadingSpinner = document.getElementById('loadingSpinner');
+                this.resultMessage = document.getElementById('resultMessage');
+                this.setupForm = document.getElementById('setupForm');
+                
+                this.init();
+            }
+            
+            init() {
+                this.addressInput.addEventListener('input', () => this.validateAddress());
+                this.setupForm.addEventListener('submit', (e) => this.handleSubmit(e));
+                
+                // Auto-focus the input
+                this.addressInput.focus();
+            }
+            
+            validateAddress() {
+                const address = this.addressInput.value.trim();
+                
+                if (!address) {
+                    this.validationDiv.textContent = '';
+                    this.fetchButton.disabled = true;
+                    return;
+                }
+                
+                const validation = this.validateBitcoinAddress(address);
+                
+                if (validation.valid) {
+                    this.validationDiv.textContent = `✓ Valid ${validation.type} address`;
+                    this.validationDiv.className = 'address-validation validation-valid';
+                    this.fetchButton.disabled = false;
+                } else {
+                    this.validationDiv.textContent = `✗ ${validation.error}`;
+                    this.validationDiv.className = 'address-validation validation-invalid';
+                    this.fetchButton.disabled = true;
+                }
+            }
+            
+            validateBitcoinAddress(address) {
+                if (!address || typeof address !== 'string') {
+                    return { valid: false, error: 'Address is required' };
+                }
+                
+                address = address.trim();
+                
+                // Legacy address (P2PKH: starts with 1, P2SH: starts with 3)
+                if (address.startsWith('1') || address.startsWith('3')) {
+                    if (address.length >= 25 && address.length <= 34) {
+                        const type = address.startsWith('1') ? 'Legacy P2PKH' : 'Legacy P2SH';
+                        return { valid: true, type: type };
+                    }
+                }
+                
+                // Bech32 address (SegWit: starts with bc1)
+                else if (address.startsWith('bc1')) {
+                    if (address.length >= 42) {
+                        if (address.startsWith('bc1q')) {
+                            return { valid: true, type: 'SegWit v0 (P2WPKH/P2WSH)' };
+                        } else if (address.startsWith('bc1p')) {
+                            return { valid: true, type: 'Taproot (P2TR)' };
+                        } else {
+                            return { valid: true, type: 'SegWit' };
+                        }
+                    }
+                }
+                
+                return { valid: false, error: 'Invalid Bitcoin address format' };
+            }
+            
+            async handleSubmit(event) {
+                event.preventDefault();
+                
+                const address = this.addressInput.value.trim();
+                if (!address) return;
+                
+                this.setLoading(true);
+                this.hideResult();
+                
+                try {
+                    const response = await fetch('/api/fetch-ordinals', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ address: address })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.showResult(
+                            `✅ Success! Found ${data.image_count} image inscriptions out of ${data.total_count} total inscriptions.`,
+                            'success'
+                        );
+                        
+                        // Redirect to selection page after a short delay
+                        setTimeout(() => {
+                            window.location.href = '/select';
+                        }, 2000);
+                        
+                    } else {
+                        this.showResult(`❌ Error: ${data.message}`, 'error');
+                    }
+                    
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    this.showResult('❌ Network error. Please check your connection and try again.', 'error');
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+            
+            setLoading(loading) {
+                if (loading) {
+                    this.loadingSpinner.style.display = 'inline-block';
+                    this.buttonText.textContent = 'Fetching Ordinals...';
+                    this.fetchButton.disabled = true;
+                } else {
+                    this.loadingSpinner.style.display = 'none';
+                    this.buttonText.textContent = 'Fetch My Ordinals';
+                    this.fetchButton.disabled = false;
+                }
+            }
+            
+            showResult(message, type) {
+                this.resultMessage.textContent = message;
+                this.resultMessage.className = `result-message result-${type}`;
+                this.resultMessage.style.display = 'block';
+            }
+            
+            hideResult() {
+                this.resultMessage.style.display = 'none';
+            }
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new SetupManager();
+        });
+    </script>
+</body>
+</html>
