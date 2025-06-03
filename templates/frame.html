@@ -39,16 +39,75 @@
         .ordinal-display {
             max-width: 90vw;
             max-height: 85vh;
-            object-fit: contain;
             border-radius: 8px;
             transition: all 0.4s ease;
             cursor: pointer;
             box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .ordinal-display:hover {
             transform: scale(1.02);
             box-shadow: 0 15px 60px rgba(247, 147, 26, 0.3);
+        }
+
+        .ordinal-display img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .ordinal-display iframe {
+            width: 800px;
+            height: 600px;
+            max-width: 90vw;
+            max-height: 85vh;
+            border: none;
+            border-radius: 8px;
+            background: #000;
+        }
+
+        .ordinal-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #f7931a;
+            text-align: center;
+            padding: 40px;
+            width: 400px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 2px solid rgba(247, 147, 26, 0.3);
+        }
+
+        .ordinal-fallback .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .ordinal-fallback .title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .ordinal-fallback .subtitle {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-bottom: 15px;
+        }
+
+        .ordinal-fallback .id {
+            font-size: 11px;
+            opacity: 0.5;
+            word-break: break-all;
+            max-width: 300px;
         }
 
         .metadata-overlay {
@@ -296,7 +355,7 @@
             border-color: rgba(247, 147, 26, 0.5);
         }
 
-        /* Responsive adjustments for different screen sizes */
+        /* Responsive adjustments */
         @media (max-width: 1280px) and (max-height: 800px) {
             .ordinal-display {
                 max-width: 95vw;
@@ -306,10 +365,6 @@
             .metadata-overlay {
                 font-size: 12px;
                 padding: 20px;
-            }
-            
-            .touch-hint, .slideshow-indicator {
-                font-size: 10px;
             }
         }
 
@@ -325,11 +380,9 @@
                 font-size: 14px;
             }
             
-            .metadata-overlay {
-                left: 15px;
-                right: 15px;
-                bottom: 15px;
-                padding: 15px;
+            .ordinal-display iframe {
+                width: 95vw;
+                height: 70vh;
             }
         }
     </style>
@@ -349,7 +402,7 @@
         <div class="slideshow-indicator" id="slideshowIndicator">Auto: 30s</div>
         
         <!-- Main display area -->
-        <img id="ordinalImage" class="ordinal-display" src="" alt="Ordinal Inscription" style="display: none;">
+        <div id="ordinalContainer" class="ordinal-display" style="display: none;"></div>
         
         <!-- Loading state -->
         <div id="loadingState" class="loading">
@@ -389,13 +442,13 @@
                 this.showingMetadata = false;
                 this.metadataTimeout = null;
                 this.slideshowInterval = null;
-                this.slideshowDuration = {{ slideshow_interval | default(30) }} * 1000; // Convert to milliseconds
+                this.slideshowDuration = {{ slideshow_interval | default(30) }} * 1000;
                 this.isPlaying = true;
                 
                 // DOM elements
                 this.loadingEl = document.getElementById('loadingState');
                 this.errorEl = document.getElementById('errorState');
-                this.imageEl = document.getElementById('ordinalImage');
+                this.containerEl = document.getElementById('ordinalContainer');
                 this.metadataEl = document.getElementById('metadataOverlay');
                 this.navEl = document.getElementById('navIndicators');
                 this.playPauseBtn = document.getElementById('playPauseBtn');
@@ -419,26 +472,23 @@
             }
             
             async loadOrdinals() {
-                // Load ordinals data from server
                 this.ordinals = {{ ordinals | tojson | safe }};
-                
-                // Simulate loading delay for smooth UX
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
             
             setupEventListeners() {
                 // Touch/click to cycle
-                this.imageEl.addEventListener('click', (e) => {
+                this.containerEl.addEventListener('click', (e) => {
                     e.preventDefault();
                     this.nextOrdinal();
                 });
                 
-                this.imageEl.addEventListener('touchend', (e) => {
+                this.containerEl.addEventListener('touchend', (e) => {
                     e.preventDefault();
                     this.nextOrdinal();
                 });
                 
-                // Long press/hold to show metadata
+                // Long press for metadata
                 let pressTimer = null;
                 let touchStartTime = 0;
                 
@@ -450,21 +500,18 @@
                 const endPress = () => {
                     const pressDuration = Date.now() - touchStartTime;
                     clearTimeout(pressTimer);
-                    
-                    // If it was a quick press (< 300ms), cycle to next
                     if (pressDuration < 300) {
                         this.nextOrdinal();
                     }
                 };
                 
-                this.imageEl.addEventListener('mousedown', startPress);
-                this.imageEl.addEventListener('mouseup', endPress);
-                this.imageEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+                this.containerEl.addEventListener('mousedown', startPress);
+                this.containerEl.addEventListener('mouseup', endPress);
+                this.containerEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+                this.containerEl.addEventListener('touchstart', startPress);
+                this.containerEl.addEventListener('touchend', endPress);
                 
-                this.imageEl.addEventListener('touchstart', startPress);
-                this.imageEl.addEventListener('touchend', endPress);
-                
-                // Keyboard navigation (for development)
+                // Keyboard navigation
                 document.addEventListener('keydown', (e) => {
                     switch(e.key) {
                         case 'ArrowRight':
@@ -494,30 +541,108 @@
                 this.currentIndex = index;
                 const ordinal = this.ordinals[index];
                 
-                // Show loading state
-                this.imageEl.style.display = 'none';
+                // Clear container
+                this.containerEl.style.display = 'none';
+                this.containerEl.innerHTML = '';
                 
-                // Load the image
-                const img = new Image();
+                const contentUrl = `/content/${ordinal.id}`;
+                
+                if (ordinal.content_type && ordinal.content_type.includes('text/html')) {
+                    // Use the EXACT same approach as selection page
+                    this.containerEl.innerHTML = `
+                        <iframe src="${contentUrl}" 
+                                style="width: 800px; height: 600px; max-width: 90vw; max-height: 85vh; border: none; background: #000; border-radius: 8px;"
+                                title="Inscription #${ordinal.number}">
+                        </iframe>
+                    `;
+                } else {
+                    // Handle images
+                    this.containerEl.innerHTML = `
+                        <img src="${contentUrl}" 
+                            alt="Inscription #${ordinal.number}"
+                            style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px;"
+                            onload="this.parentElement.style.display='flex'"
+                            onerror="this.parentElement.innerHTML='<div class=&quot;ordinal-fallback&quot;><div class=&quot;icon&quot;>🖼️</div><div class=&quot;title&quot;>Image Loading Error</div></div>'; this.parentElement.style.display='flex'">
+                    `;
+                }
+                
+                // Show the container
+                this.containerEl.style.display = 'flex';
+                this.updateNavIndicators();
+                this.updateMetadata(ordinal);
+            }
+            
+            loadHTMLContent(ordinal, contentUrl) {
+                const iframe = document.createElement('iframe');
+                iframe.src = contentUrl;
+                iframe.title = `Inscription #${ordinal.number}`;
+                iframe.style.cssText = 'width: 100%; height: 100%; border: none; background: #000;';
+                
+                // Simple approach - just load it like the selection page
+                iframe.onload = () => {
+                    this.containerEl.appendChild(iframe);
+                    this.containerEl.style.display = 'flex';
+                    this.updateNavIndicators();
+                };
+                
+                // Only show fallback on actual error, not timeout
+                iframe.onerror = () => {
+                    this.showHTMLFallback(ordinal);
+                };
+            }
+                        
+            showHTMLFallback(ordinal) {
+                const fallback = document.createElement('div');
+                fallback.className = 'ordinal-fallback';
+                
+                const icon = ordinal.id.includes('cat') || ordinal.number > 50000000 ? '🐱' : '📄';
+                
+                fallback.innerHTML = `
+                    <div class="icon">${icon}</div>
+                    <div class="title">Inscription #${ordinal.number}</div>
+                    <div class="subtitle">Interactive HTML Content</div>
+                    <div class="id">${ordinal.id}</div>
+                `;
+                
+                this.containerEl.appendChild(fallback);
+                this.containerEl.style.display = 'flex';
+                
+                // Add small delay to match image loading timing
+                setTimeout(() => {
+                    this.updateNavIndicators();
+                }, 100);
+            }
+            
+            loadImageContent(ordinal, contentUrl) {
+                const img = document.createElement('img');
+                img.alt = `Inscription #${ordinal.number}`;
+                
                 img.onload = () => {
-                    this.imageEl.src = ordinal.content_url || `/content/${ordinal.id}`;
-                    this.imageEl.alt = `Inscription #${ordinal.number}`;
-                    this.imageEl.style.display = 'block';
+                    this.containerEl.appendChild(img);
+                    this.containerEl.style.display = 'flex';
                     this.updateNavIndicators();
                 };
                 
                 img.onerror = () => {
-                    console.error('Failed to load ordinal:', ordinal.id);
-                    // Try next ordinal if this one fails
-                    if (this.ordinals.length > 1) {
-                        setTimeout(() => this.nextOrdinal(), 1000);
-                    }
+                    this.showImageFallback(ordinal);
                 };
                 
-                img.src = ordinal.content_url || `/content/${ordinal.id}`;
+                img.src = contentUrl;
+            }
+            
+            showImageFallback(ordinal) {
+                const fallback = document.createElement('div');
+                fallback.className = 'ordinal-fallback';
+                fallback.innerHTML = `
+                    <div class="icon">🖼️</div>
+                    <div class="title">Inscription #${ordinal.number}</div>
+                    <div class="subtitle">Image Content</div>
+                    <div class="id">${ordinal.id}</div>
+                `;
                 
-                // Update metadata
-                this.updateMetadata(ordinal);
+                this.containerEl.appendChild(fallback);
+                this.containerEl.style.display = 'flex';
+                this.updateNavIndicators();
             }
             
             updateMetadata(ordinal) {
@@ -571,8 +696,6 @@
             showMetadata() {
                 this.metadataEl.classList.add('show');
                 this.showingMetadata = true;
-                
-                // Auto-hide after 5 seconds
                 clearTimeout(this.metadataTimeout);
                 this.metadataTimeout = setTimeout(() => this.hideMetadata(), 5000);
             }
@@ -646,14 +769,12 @@
             }
         }
         
-        // Global function for slideshow toggle
         function toggleSlideshow() {
             if (window.ordinalFrame) {
                 window.ordinalFrame.toggleSlideshow();
             }
         }
         
-        // Initialize the frame when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             window.ordinalFrame = new OrdinalFrame();
         });

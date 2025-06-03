@@ -308,12 +308,12 @@ class OrdinalsManager:
         try:
             inscriptions = self.api_client.fetch_address_inscriptions(address)
             
-            # Filter for supported image types
-            image_inscriptions = []
-            for inscription in inscriptions:
-                content_type = inscription.get('content_type', '').lower()
-                if any(fmt in content_type for fmt in ['image', 'svg']):
-                    image_inscriptions.append(inscription)
+            # Filter for supported image types - TEMPORARILY DISABLED
+            image_inscriptions = inscriptions  # Show everything
+            # for inscription in inscriptions:
+            #     content_type = inscription.get('content_type', '').lower()
+            #     if any(fmt in content_type for fmt in ['image', 'svg']):
+            #         image_inscriptions.append(inscription)
             
             # Update metadata
             self.metadata = {
@@ -490,18 +490,27 @@ def create_app() -> Flask:
     # Content serving
     @app.route('/content/<inscription_id>')
     def serve_inscription_content(inscription_id):
-        """Proxy inscription content from API"""
+        """Proxy inscription content from API with proper headers for HTML content"""
         try:
             content_url = f"{Config.HIRO_API_BASE}/inscriptions/{inscription_id}/content"
             
             response = requests.get(content_url, timeout=Config.REQUEST_TIMEOUT)
             response.raise_for_status()
             
-            # Return the content with appropriate headers
-            return response.content, response.status_code, {
-                'Content-Type': response.headers.get('Content-Type', 'application/octet-stream'),
+            content_type = response.headers.get('Content-Type', 'application/octet-stream')
+            
+            # For HTML content, modify headers to allow iframe embedding
+            headers = {
+                'Content-Type': content_type,
                 'Cache-Control': 'public, max-age=86400'  # Cache for 24 hours
             }
+            
+            # Remove frame restrictions for HTML content
+            if 'text/html' in content_type:
+                headers['X-Frame-Options'] = 'ALLOWALL'
+                headers['Content-Security-Policy'] = "frame-ancestors *"
+            
+            return response.content, response.status_code, headers
             
         except Exception as e:
             logger.error(f"Error serving inscription content: {e}")

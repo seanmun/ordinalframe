@@ -25,6 +25,40 @@
       }
     },
     {
+      "id": "6e357a44a6d2e4a0cd46ea568c48c5c412f02baa6cbbccba7c3a6e8fc9bf8c13i820",
+      "number": 53788240,
+      "address": "bc1prrx90unuys03pkylsspf776us24gdkrssu8vg476vw9c9s83zpgq4wyreg",
+      "content_type": "text/html;charset=utf-8",
+      "content_length": 109,
+      "content_url": "https://api.hiro.so/ordinals/v1/inscriptions/6e357a44a6d2e4a0cd46ea568c48c5c412f02baa6cbbccba7c3a6e8fc9bf8c13i820/content",
+      "timestamp": 1743432993000,
+      "sat_ordinal": "1930730626987604",
+      "sat_rarity": "common",
+      "fee": 0,
+      "value": "546",
+      "block_height": 824867,
+      "tx_id": "6e357a44a6d2e4a0cd46ea568c48c5c412f02baa6cbbccba7c3a6e8fc9bf8c13",
+      "collection_slug": null,
+      "metadata": null
+    },
+    {
+      "id": "4b31771df21656d2a77e6fa18720a6dd94b04510b9065a7c67250d5c89ad2079i576",
+      "number": 53786436,
+      "address": "bc1prrx90unuys03pkylsspf776us24gdkrssu8vg476vw9c9s83zpgq4wyreg",
+      "content_type": "text/html;charset=utf-8",
+      "content_length": 109,
+      "content_url": "https://api.hiro.so/ordinals/v1/inscriptions/4b31771df21656d2a77e6fa18720a6dd94b04510b9065a7c67250d5c89ad2079i576/content",
+      "timestamp": 1743432993000,
+      "sat_ordinal": "1213293741784268",
+      "sat_rarity": "common",
+      "fee": 0,
+      "value": "546",
+      "block_height": 824865,
+      "tx_id": "4b31771df21656d2a77e6fa18720a6dd94b04510b9065a7c67250d5c89ad2079",
+      "collection_slug": null,
+      "metadata": null
+    },
+    {
       "id": "41abe9130d402b8c52fda88f9d11c8fe5ef1c96908b8d4c1c0f878d7d931fe17i0",
       "number": 9534612,
       "address": "bc1prrx90unuys03pkylsspf776us24gdkrssu8vg476vw9c9s83zpgq4wyreg",
@@ -76,8 +110,8 @@
       "metadata": null
     }
   ],
-  "last_updated": "2025-06-02T23:29:05.420850",
+  "last_updated": "2025-06-03T00:08:39.809628",
   "address": "bc1prrx90unuys03pkylsspf776us24gdkrssu8vg476vw9c9s83zpgq4wyreg",
   "total_count": 6,
-  "image_count": 4
+  "image_count": 6
 }
